@@ -34,6 +34,9 @@ class OpenAIClient(BaseLLMClient):
         except APIError as e:
             return ModelResponse(provider=Provider.OPENAI, model=self.model, content="",
                                   error=f"Error de la API de OpenAI: {e}")
+        except Exception as e:  # red de seguridad: cualquier error imprevisto
+            return ModelResponse(provider=Provider.OPENAI, model=self.model, content="",
+                                  error=f"Error inesperado: {e}")
 
     async def generate_stream(self, messages: List[ChatMessage]) -> AsyncGenerator[str, None]:
         try:
@@ -50,3 +53,5 @@ class OpenAIClient(BaseLLMClient):
                     yield delta
         except (RateLimitError, APIConnectionError, APIError) as e:
             yield f"\n[⚠️ Error durante el streaming: {e}]"
+        except Exception as e:  # red de seguridad: cualquier error imprevisto
+            yield f"\n[⚠️ Error inesperado durante el streaming: {e}]"
