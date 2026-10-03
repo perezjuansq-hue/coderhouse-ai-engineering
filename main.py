@@ -1,5 +1,6 @@
 import asyncio
 import os
+import sys
 
 from dotenv import load_dotenv
 from pydantic import ValidationError
@@ -20,7 +21,10 @@ def cargar_config() -> LLMConfig:
     """Lee el .env y arma una configuración validada por Pydantic."""
     load_dotenv()
 
-    provider = Provider(os.getenv("LLM_PROVIDER", "").strip().lower())
+    valor_provider = os.getenv("LLM_PROVIDER", "").strip().lower()
+    if not valor_provider:
+        raise ValueError("Falta LLM_PROVIDER (valores aceptados: openai, anthropic)")
+    provider = Provider(valor_provider)
 
     variable_modelo = "OPENAI_MODEL" if provider == Provider.OPENAI else "ANTHROPIC_MODEL"
     # `or` cubre tanto la variable ausente como la variable vacía (OPENAI_MODEL=)
@@ -60,4 +64,7 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    # En Windows la consola puede no usar UTF-8: sin esto, un emoji en la respuesta
+    # (o el "⚠️" de los errores) lanza UnicodeEncodeError al imprimir.
+    sys.stdout.reconfigure(encoding="utf-8")
     asyncio.run(main())
