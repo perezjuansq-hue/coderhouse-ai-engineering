@@ -26,7 +26,7 @@ class LLMConfig(BaseModel):
     model: str
     openai_api_key: Optional[SecretStr] = None
     anthropic_api_key: Optional[SecretStr] = None
-    temperature: float = Field(default=0.7, ge=0, le=2)
+    temperature: float = Field(default=1.0, ge=0, le=2)
     max_tokens: int = Field(default=1024, gt=0)
 
 
